@@ -6,6 +6,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Sidebar } from "./components/Sidebar";
 import { SelectionProvider } from "./contexts/SelectionContext";
+import { UserProvider } from "./contexts/UserContext";
+import { NotificationSystem, useNotifications } from "./components/NotificationSystem";
 import Dashboard from "./pages/Dashboard";
 import LearnAI from "./pages/LearnAI";
 import CodingArea from "./pages/CodingArea";
@@ -15,32 +17,42 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <SelectionProvider>
-        <BrowserRouter>
-          <div className="min-h-screen flex w-full">
-            <Sidebar />
-            <main className="flex-1">
-              <Routes>
-                <Route path="/" element={<Dashboard />} />
-                <Route path="/learn" element={<LearnAI />} />
-                <Route path="/code" element={<CodingArea />} />
-                <Route path="/datasets" element={<Datasets />} />
-                <Route path="/models" element={<MLModels />} />
-                <Route path="/training" element={<Dashboard />} />
-                <Route path="/progress" element={<Dashboard />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </main>
-          </div>
-        </BrowserRouter>
-      </SelectionProvider>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+const App = () => {
+  const { notifications, addNotification, removeNotification } = useNotifications();
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <UserProvider>
+          <SelectionProvider>
+            <BrowserRouter>
+              <div className="min-h-screen flex w-full">
+                <Sidebar />
+                <main className="flex-1">
+                  <Routes>
+                    <Route path="/" element={<Dashboard />} />
+                    <Route path="/learn" element={<LearnAI />} />
+                    <Route path="/code" element={<CodingArea />} />
+                    <Route path="/datasets" element={<Datasets />} />
+                    <Route path="/models" element={<MLModels />} />
+                    <Route path="/training" element={<Dashboard />} />
+                    <Route path="/progress" element={<Dashboard />} />
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </main>
+                <NotificationSystem 
+                  notifications={notifications}
+                  onRemove={removeNotification}
+                />
+              </div>
+            </BrowserRouter>
+          </SelectionProvider>
+        </UserProvider>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;
