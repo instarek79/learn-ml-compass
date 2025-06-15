@@ -1,6 +1,8 @@
 
 import React, { useState } from 'react';
 import { Play, Code, FileText, Lightbulb } from 'lucide-react';
+import { JupyterLauncher } from '../components/JupyterLauncher';
+import { MLAlgorithmExplorer } from '../components/MLAlgorithmExplorer';
 
 const CodingArea = () => {
   const [code, setCode] = useState(`# Welcome to the AI Coding Area!
@@ -29,16 +31,19 @@ print(f"Prediction for x={new_x}: {prediction}")
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-green-900 to-slate-900 p-6">
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-7xl mx-auto space-y-8">
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-white mb-2 flex items-center">
             <Code className="w-10 h-10 mr-4 text-green-400" />
-            Interactive Coding Area
+            Interactive Coding & Learning Area
           </h1>
           <p className="text-xl text-slate-300">
-            Practice AI concepts with hands-on coding examples and tutorials
+            Practice AI concepts with hands-on coding examples, Jupyter notebooks, and interactive learning
           </p>
         </div>
+
+        {/* ML Algorithm Explorer */}
+        <MLAlgorithmExplorer />
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Code Editor */}
@@ -79,6 +84,9 @@ print(f"Prediction for x={new_x}: {prediction}")
 
           {/* Sidebar with Learning Notes */}
           <div className="space-y-6">
+            {/* Jupyter Launcher */}
+            <JupyterLauncher />
+
             <div className="bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-2xl p-6 border border-blue-400/30">
               <h3 className="text-lg font-semibold text-blue-400 mb-4 flex items-center">
                 <Lightbulb className="w-5 h-5 mr-2" />
@@ -126,6 +134,7 @@ print(f"Prediction for x={new_x}: {prediction}")
                 <li>• Experiment with different algorithms</li>
                 <li>• Use print() to debug your code</li>
                 <li>• Test edge cases and unusual inputs</li>
+                <li>• Launch Jupyter for interactive analysis</li>
               </ul>
             </div>
           </div>
