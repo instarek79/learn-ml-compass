@@ -1,6 +1,16 @@
 
 import React, { useState } from 'react';
-import { Brain, TrendingUp, GitBranch, Network, Target, ChevronRight, Lightbulb, HelpCircle } from 'lucide-react';
+import { Brain, TrendingUp, GitBranch, Network, Target, ChevronRight, Lightbulb, HelpCircle, Settings, Sliders } from 'lucide-react';
+
+interface AlgorithmParameter {
+  name: string;
+  description: string;
+  type: 'number' | 'select' | 'boolean';
+  defaultValue: any;
+  options?: string[];
+  min?: number;
+  max?: number;
+}
 
 interface Algorithm {
   id: string;
@@ -18,6 +28,7 @@ interface Algorithm {
   options: string[];
   correctAnswer: number;
   explanation: string;
+  parameters: AlgorithmParameter[];
 }
 
 const algorithms: Algorithm[] = [
@@ -36,7 +47,30 @@ const algorithms: Algorithm[] = [
     interactiveQuestion: "If you're predicting house prices and you know that each additional square foot adds $100 to the price, and a 1000 sq ft house costs $200,000, what would a 1500 sq ft house cost?",
     options: ["$250,000", "$300,000", "$350,000", "$400,000"],
     correctAnswer: 0,
-    explanation: "1500 sq ft house = $200,000 + (500 extra sq ft × $100) = $250,000"
+    explanation: "1500 sq ft house = $200,000 + (500 extra sq ft × $100) = $250,000",
+    parameters: [
+      {
+        name: "Learning Rate",
+        description: "How fast the algorithm learns from mistakes",
+        type: "number",
+        defaultValue: 0.01,
+        min: 0.001,
+        max: 1
+      },
+      {
+        name: "Regularization",
+        description: "Prevents overfitting by penalizing complex models",
+        type: "select",
+        defaultValue: "none",
+        options: ["none", "ridge", "lasso", "elastic_net"]
+      },
+      {
+        name: "Fit Intercept",
+        description: "Whether to calculate the intercept term",
+        type: "boolean",
+        defaultValue: true
+      }
+    ]
   },
   {
     id: 'decision_tree',
@@ -53,7 +87,32 @@ const algorithms: Algorithm[] = [
     interactiveQuestion: "In a decision tree for loan approval, what would be the BEST first question to ask?",
     options: ["What's your favorite color?", "What's your annual income?", "What's your shoe size?", "What's your pet's name?"],
     correctAnswer: 1,
-    explanation: "Annual income is most relevant for loan decisions - it directly impacts ability to repay!"
+    explanation: "Annual income is most relevant for loan decisions - it directly impacts ability to repay!",
+    parameters: [
+      {
+        name: "Max Depth",
+        description: "Maximum depth of the tree to prevent overfitting",
+        type: "number",
+        defaultValue: 5,
+        min: 1,
+        max: 20
+      },
+      {
+        name: "Min Samples Split",
+        description: "Minimum number of samples required to split a node",
+        type: "number",
+        defaultValue: 2,
+        min: 2,
+        max: 100
+      },
+      {
+        name: "Criterion",
+        description: "Function to measure quality of a split",
+        type: "select",
+        defaultValue: "gini",
+        options: ["gini", "entropy", "log_loss"]
+      }
+    ]
   },
   {
     id: 'neural_network',
@@ -70,7 +129,40 @@ const algorithms: Algorithm[] = [
     interactiveQuestion: "Why do neural networks need multiple layers?",
     options: ["To make them look complex", "To learn simple patterns only", "To learn increasingly complex patterns", "To slow down processing"],
     correctAnswer: 2,
-    explanation: "Each layer learns more complex features - first layer might detect edges, second layer shapes, third layer objects!"
+    explanation: "Each layer learns more complex features - first layer might detect edges, second layer shapes, third layer objects!",
+    parameters: [
+      {
+        name: "Hidden Layers",
+        description: "Number of hidden layers in the network",
+        type: "number",
+        defaultValue: 2,
+        min: 1,
+        max: 10
+      },
+      {
+        name: "Neurons per Layer",
+        description: "Number of neurons in each hidden layer",
+        type: "number",
+        defaultValue: 64,
+        min: 8,
+        max: 512
+      },
+      {
+        name: "Activation Function",
+        description: "Function that determines neuron output",
+        type: "select",
+        defaultValue: "relu",
+        options: ["relu", "sigmoid", "tanh", "softmax"]
+      },
+      {
+        name: "Dropout Rate",
+        description: "Percentage of neurons to randomly ignore during training",
+        type: "number",
+        defaultValue: 0.2,
+        min: 0,
+        max: 0.8
+      }
+    ]
   }
 ];
 
@@ -79,6 +171,8 @@ export const MLAlgorithmExplorer = () => {
   const [showQuiz, setShowQuiz] = useState(false);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [showExplanation, setShowExplanation] = useState(false);
+  const [showParameters, setShowParameters] = useState(false);
+  const [parameterValues, setParameterValues] = useState<{[key: string]: any}>({});
 
   const handleAnswerSelect = (answerIndex: number) => {
     setSelectedAnswer(answerIndex);
@@ -89,6 +183,58 @@ export const MLAlgorithmExplorer = () => {
     setShowQuiz(false);
     setSelectedAnswer(null);
     setShowExplanation(false);
+  };
+
+  const handleParameterChange = (paramName: string, value: any) => {
+    setParameterValues(prev => ({
+      ...prev,
+      [paramName]: value
+    }));
+  };
+
+  const renderParameterInput = (param: AlgorithmParameter) => {
+    const currentValue = parameterValues[param.name] ?? param.defaultValue;
+
+    switch (param.type) {
+      case 'number':
+        return (
+          <input
+            type="number"
+            value={currentValue}
+            min={param.min}
+            max={param.max}
+            step={param.min && param.min < 1 ? 0.001 : 1}
+            onChange={(e) => handleParameterChange(param.name, parseFloat(e.target.value))}
+            className="w-full bg-slate-700 text-white px-3 py-2 rounded-lg border border-slate-600 focus:border-purple-400 focus:outline-none"
+          />
+        );
+      case 'select':
+        return (
+          <select
+            value={currentValue}
+            onChange={(e) => handleParameterChange(param.name, e.target.value)}
+            className="w-full bg-slate-700 text-white px-3 py-2 rounded-lg border border-slate-600 focus:border-purple-400 focus:outline-none"
+          >
+            {param.options?.map(option => (
+              <option key={option} value={option}>{option}</option>
+            ))}
+          </select>
+        );
+      case 'boolean':
+        return (
+          <label className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              checked={currentValue}
+              onChange={(e) => handleParameterChange(param.name, e.target.checked)}
+              className="w-4 h-4 text-purple-600 bg-slate-700 border-slate-600 rounded focus:ring-purple-500"
+            />
+            <span className="text-slate-300">{currentValue ? 'Enabled' : 'Disabled'}</span>
+          </label>
+        );
+      default:
+        return null;
+    }
   };
 
   return (
@@ -111,6 +257,7 @@ export const MLAlgorithmExplorer = () => {
               onClick={() => {
                 setSelectedAlgorithm(algorithm);
                 resetQuiz();
+                setShowParameters(false);
               }}
               className={`p-4 rounded-xl border transition-all ${
                 selectedAlgorithm.id === algorithm.id
@@ -127,6 +274,36 @@ export const MLAlgorithmExplorer = () => {
           );
         })}
       </div>
+
+      {/* Algorithm Parameters Toggle */}
+      <div className="mb-6">
+        <button
+          onClick={() => setShowParameters(!showParameters)}
+          className="flex items-center space-x-2 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors"
+        >
+          <Settings className="w-4 h-4" />
+          <span>{showParameters ? 'Hide Parameters' : 'Show Parameters'}</span>
+        </button>
+      </div>
+
+      {/* Parameters Section */}
+      {showParameters && (
+        <div className="mb-8 bg-gradient-to-r from-purple-500/10 to-indigo-500/10 rounded-xl p-6 border border-purple-400/20">
+          <h3 className="text-lg font-semibold text-purple-400 mb-4 flex items-center">
+            <Sliders className="w-5 h-5 mr-2" />
+            Algorithm Parameters
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {selectedAlgorithm.parameters.map((param, index) => (
+              <div key={index} className="bg-slate-700/30 rounded-lg p-4">
+                <label className="block text-white font-medium mb-1">{param.name}</label>
+                <p className="text-slate-400 text-xs mb-3">{param.description}</p>
+                {renderParameterInput(param)}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Selected Algorithm Details */}
       <div className="space-y-6">
