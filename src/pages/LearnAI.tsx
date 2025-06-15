@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { Brain, Lightbulb, Target, Zap } from 'lucide-react';
+import { MLAlgorithmExplorer } from '../components/MLAlgorithmExplorer';
 
 const LearnAI = () => {
   return (
@@ -14,6 +15,11 @@ const LearnAI = () => {
           <p className="text-xl text-slate-300">
             Master the fundamentals of Artificial Intelligence with interactive lessons
           </p>
+        </div>
+
+        {/* ML Algorithm Explorer */}
+        <div className="mb-8">
+          <MLAlgorithmExplorer />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

@@ -2,7 +2,6 @@
 import React, { useState } from 'react';
 import { Play, Code, FileText, Lightbulb } from 'lucide-react';
 import { JupyterLauncher } from '../components/JupyterLauncher';
-import { MLAlgorithmExplorer } from '../components/MLAlgorithmExplorer';
 
 const CodingArea = () => {
   const [code, setCode] = useState(`# Welcome to the AI Coding Area!
@@ -35,15 +34,12 @@ print(f"Prediction for x={new_x}: {prediction}")
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-white mb-2 flex items-center">
             <Code className="w-10 h-10 mr-4 text-green-400" />
-            Interactive Coding & Learning Area
+            Interactive Coding & Practice Area
           </h1>
           <p className="text-xl text-slate-300">
-            Practice AI concepts with hands-on coding examples, Jupyter notebooks, and interactive learning
+            Practice AI concepts with hands-on coding examples and Jupyter notebooks
           </p>
         </div>
-
-        {/* ML Algorithm Explorer */}
-        <MLAlgorithmExplorer />
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           {/* Code Editor */}
