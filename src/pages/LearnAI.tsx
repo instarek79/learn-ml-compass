@@ -1,7 +1,8 @@
 
 import React, { useState } from 'react';
-import { Brain, Lightbulb, Target, Zap, Play, CheckCircle } from 'lucide-react';
+import { Brain, Lightbulb, Target, Zap, Play, CheckCircle, BookOpen, ArrowRight } from 'lucide-react';
 import { MLAlgorithmExplorer } from '../components/MLAlgorithmExplorer';
+import { Link } from 'react-router-dom';
 
 const LearnAI = () => {
   const [moduleProgress, setModuleProgress] = useState({
@@ -12,6 +13,7 @@ const LearnAI = () => {
   });
 
   const [selectedModule, setSelectedModule] = useState<string | null>(null);
+  const [completedLessons, setCompletedLessons] = useState<string[]>([]);
 
   const modules = [
     { 
@@ -20,7 +22,15 @@ const LearnAI = () => {
       progress: moduleProgress.intro, 
       lessons: 6, 
       desc: "Basic concepts and history",
-      content: "Learn the fundamentals of AI, its history, and key concepts that form the foundation of artificial intelligence."
+      content: "Learn the fundamentals of AI, its history, and key concepts that form the foundation of artificial intelligence.",
+      detailedLessons: [
+        "What is Artificial Intelligence?",
+        "History and Evolution of AI", 
+        "Types of AI: Narrow vs General",
+        "AI Applications in Real World",
+        "Machine Learning Basics",
+        "Getting Started with AI Tools"
+      ]
     },
     { 
       id: 'data', 
@@ -28,7 +38,13 @@ const LearnAI = () => {
       progress: moduleProgress.data, 
       lessons: 4, 
       desc: "Understanding data types and structures",
-      content: "Explore different types of data, how to structure datasets, and prepare data for machine learning algorithms."
+      content: "Explore different types of data, how to structure datasets, and prepare data for machine learning algorithms.",
+      detailedLessons: [
+        "Types of Data: Structured vs Unstructured",
+        "Data Collection and Sources",
+        "Data Cleaning and Preprocessing", 
+        "Exploratory Data Analysis"
+      ]
     },
     { 
       id: 'ml_basics', 
@@ -36,7 +52,17 @@ const LearnAI = () => {
       progress: moduleProgress.ml_basics, 
       lessons: 8, 
       desc: "Supervised, unsupervised, and reinforcement learning",
-      content: "Deep dive into the three main types of machine learning and understand when to use each approach."
+      content: "Deep dive into the three main types of machine learning and understand when to use each approach.",
+      detailedLessons: [
+        "Supervised Learning Overview",
+        "Classification vs Regression",
+        "Unsupervised Learning Concepts",
+        "Clustering and Dimensionality Reduction",
+        "Reinforcement Learning Basics", 
+        "Model Training and Validation",
+        "Overfitting and Underfitting",
+        "Model Evaluation Metrics"
+      ]
     },
     { 
       id: 'neural_networks', 
@@ -44,37 +70,75 @@ const LearnAI = () => {
       progress: moduleProgress.neural_networks, 
       lessons: 5, 
       desc: "Building blocks of deep learning",
-      content: "Understand how neural networks work, from basic perceptrons to deep learning architectures."
+      content: "Understand how neural networks work, from basic perceptrons to deep learning architectures.",
+      detailedLessons: [
+        "What are Neural Networks?",
+        "Perceptrons and Neurons",
+        "Backpropagation Algorithm",
+        "Deep Learning Architectures",
+        "Convolutional and Recurrent Networks"
+      ]
     },
   ];
 
   const handleModuleClick = (moduleId: string) => {
-    setSelectedModule(moduleId);
-    // Simulate progress update
-    setModuleProgress(prev => ({
-      ...prev,
-      [moduleId]: Math.min(prev[moduleId as keyof typeof prev] + 20, 100)
-    }));
+    setSelectedModule(selectedModule === moduleId ? null : moduleId);
   };
 
-  const handleStartLesson = (moduleId: string) => {
-    setModuleProgress(prev => ({
-      ...prev,
-      [moduleId]: Math.min(prev[moduleId as keyof typeof prev] + 10, 100)
-    }));
+  const handleStartLesson = (moduleId: string, lessonIndex: number) => {
+    const lessonKey = `${moduleId}_${lessonIndex}`;
+    if (!completedLessons.includes(lessonKey)) {
+      setCompletedLessons([...completedLessons, lessonKey]);
+      setModuleProgress(prev => {
+        const module = modules.find(m => m.id === moduleId);
+        const progressIncrement = module ? Math.floor(100 / module.lessons) : 10;
+        return {
+          ...prev,
+          [moduleId]: Math.min(prev[moduleId as keyof typeof prev] + progressIncrement, 100)
+        };
+      });
+    }
   };
+
+  const getModuleData = (moduleId: string) => modules.find(m => m.id === moduleId);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 p-6">
       <div className="max-w-6xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-white mb-2 flex items-center">
+          <h1 className="text-4xl font-bold text-white mb-4 flex items-center">
             <Brain className="w-10 h-10 mr-4 text-cyan-400" />
             Learn AI from Scratch
           </h1>
-          <p className="text-xl text-slate-300">
-            Master the fundamentals of Artificial Intelligence with interactive lessons
-          </p>
+          
+          {/* Introduction Section */}
+          <div className="bg-gradient-to-r from-cyan-500/20 to-blue-500/20 rounded-xl p-6 border border-cyan-400/30 mb-6">
+            <h2 className="text-xl font-semibold text-cyan-400 mb-3">🎓 What is AI Learning?</h2>
+            <p className="text-slate-300 mb-4">
+              Your comprehensive journey to master Artificial Intelligence through structured, interactive lessons. 
+              From basic concepts to advanced neural networks, learn at your own pace with hands-on examples and real-world applications.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+              <div>
+                <h4 className="font-semibold text-white mb-2">📚 Learning Approach:</h4>
+                <ul className="text-slate-300 space-y-1">
+                  <li>• Interactive lessons with examples</li>
+                  <li>• Progressive difficulty levels</li>
+                  <li>• Hands-on algorithm exploration</li>
+                  <li>• Real-world case studies</li>
+                </ul>
+              </div>
+              <div>
+                <h4 className="font-semibold text-white mb-2">🎯 Learning Path:</h4>
+                <ul className="text-slate-300 space-y-1">
+                  <li>• Start with AI fundamentals</li>
+                  <li>• Learn data handling techniques</li>
+                  <li>• Master machine learning basics</li>
+                  <li>• Dive into neural networks</li>
+                </ul>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* ML Algorithm Explorer */}
@@ -118,7 +182,7 @@ const LearnAI = () => {
             </div>
 
             <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-8 border border-slate-700">
-              <h2 className="text-2xl font-bold text-white mb-6">Interactive Learning Modules</h2>
+              <h2 className="text-2xl font-bold text-white mb-6">📖 Interactive Learning Modules</h2>
               
               <div className="space-y-4">
                 {modules.map((module, index) => (
@@ -130,14 +194,68 @@ const LearnAI = () => {
                         
                         {selectedModule === module.id && (
                           <div className="bg-slate-600/50 rounded-lg p-4 mb-4">
-                            <p className="text-slate-200 text-sm mb-3">{module.content}</p>
-                            <button
-                              onClick={() => handleStartLesson(module.id)}
-                              className="flex items-center space-x-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors"
-                            >
-                              <Play className="w-4 h-4" />
-                              <span>Start Lesson</span>
-                            </button>
+                            <p className="text-slate-200 text-sm mb-4">{module.content}</p>
+                            
+                            <div className="space-y-3">
+                              <h4 className="font-semibold text-white text-sm">📋 Lessons in this module:</h4>
+                              {module.detailedLessons.map((lesson, lessonIndex) => {
+                                const lessonKey = `${module.id}_${lessonIndex}`;
+                                const isCompleted = completedLessons.includes(lessonKey);
+                                
+                                return (
+                                  <div key={lessonIndex} className="flex items-center justify-between bg-slate-700/50 rounded-lg p-3">
+                                    <div className="flex items-center space-x-3">
+                                      <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                                        isCompleted ? 'bg-green-500 text-white' : 'bg-slate-600 text-slate-300'
+                                      }`}>
+                                        {isCompleted ? '✓' : lessonIndex + 1}
+                                      </div>
+                                      <span className={`text-sm ${isCompleted ? 'text-green-400' : 'text-slate-300'}`}>
+                                        {lesson}
+                                      </span>
+                                    </div>
+                                    <button
+                                      onClick={() => handleStartLesson(module.id, lessonIndex)}
+                                      className={`flex items-center space-x-1 px-3 py-1 rounded text-xs transition-colors ${
+                                        isCompleted 
+                                          ? 'bg-green-600/20 text-green-400 cursor-default' 
+                                          : 'bg-blue-600 hover:bg-blue-700 text-white'
+                                      }`}
+                                      disabled={isCompleted}
+                                    >
+                                      {isCompleted ? (
+                                        <>
+                                          <CheckCircle className="w-3 h-3" />
+                                          <span>Complete</span>
+                                        </>
+                                      ) : (
+                                        <>
+                                          <Play className="w-3 h-3" />
+                                          <span>Start</span>
+                                        </>
+                                      )}
+                                    </button>
+                                  </div>
+                                );
+                              })}
+                            </div>
+                            
+                            <div className="mt-4 flex space-x-3">
+                              <Link 
+                                to="/code" 
+                                className="flex items-center space-x-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors text-sm"
+                              >
+                                <Play className="w-4 h-4" />
+                                <span>Practice in Code Area</span>
+                              </Link>
+                              <Link 
+                                to="/datasets" 
+                                className="flex items-center space-x-2 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors text-sm"
+                              >
+                                <ArrowRight className="w-4 h-4" />
+                                <span>Explore Datasets</span>
+                              </Link>
+                            </div>
                           </div>
                         )}
                       </div>
@@ -149,7 +267,7 @@ const LearnAI = () => {
                           onClick={() => handleModuleClick(module.id)}
                           className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-lg text-xs transition-colors"
                         >
-                          {selectedModule === module.id ? 'Hide Details' : 'View Details'}
+                          {selectedModule === module.id ? 'Hide Details' : 'View Lessons'}
                         </button>
                       </div>
                     </div>
