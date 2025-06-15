@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Settings, Sliders, Play, Save } from 'lucide-react';
 import { useSelection } from '../contexts/SelectionContext';
 
@@ -12,14 +12,14 @@ const MLModels = () => {
     regularization: 0.01,
   });
 
-  const models = [
+  const models = useMemo(() => [
     { id: 'linear_regression', name: 'Linear Regression', type: 'Regression', complexity: 'Beginner', description: 'Simple linear relationship modeling' },
     { id: 'logistic_regression', name: 'Logistic Regression', type: 'Classification', complexity: 'Beginner', description: 'Binary classification using logistic function' },
     { id: 'decision_tree', name: 'Decision Tree', type: 'Both', complexity: 'Intermediate', description: 'Tree-based decision making model' },
     { id: 'random_forest', name: 'Random Forest', type: 'Both', complexity: 'Intermediate', description: 'Ensemble of multiple decision trees' },
     { id: 'svm', name: 'Support Vector Machine', type: 'Both', complexity: 'Advanced', description: 'Find optimal separating hyperplane' },
     { id: 'neural_network', name: 'Neural Network', type: 'Both', complexity: 'Advanced', description: 'Deep learning with multiple layers' },
-  ];
+  ], []);
 
   useEffect(() => {
     updateStep("Configuring ML Model");
@@ -27,7 +27,7 @@ const MLModels = () => {
     if (model) {
       updateModel(model.name);
     }
-  }, [selectedModel, updateModel, updateStep]);
+  }, [selectedModel, updateModel, updateStep, models]);
 
   const handleModelSelect = (modelId: string) => {
     setSelectedModel(modelId);
@@ -35,6 +35,18 @@ const MLModels = () => {
     if (model) {
       updateModel(model.name);
     }
+  };
+
+  const handleSaveConfiguration = () => {
+    console.log('Saving configuration:', { selectedModel, parameters });
+    // TODO: Implement actual save functionality
+    alert('Configuration saved successfully!');
+  };
+
+  const handleTrainModel = () => {
+    console.log('Training model:', { selectedModel, parameters });
+    // TODO: Implement actual training functionality
+    alert(`Training ${models.find(m => m.id === selectedModel)?.name} with current parameters...`);
   };
 
   const getComplexityColor = (complexity: string) => {
@@ -114,6 +126,13 @@ const MLModels = () => {
                     <p><strong className="text-indigo-400">Limitations:</strong> Requires lots of data, slow training, less interpretable.</p>
                   </div>
                 )}
+                {selectedModel && selectedModel !== 'linear_regression' && selectedModel !== 'neural_network' && (
+                  <div className="space-y-3 text-sm text-slate-300">
+                    <p><strong className="text-white">{models.find(m => m.id === selectedModel)?.name}</strong> - {models.find(m => m.id === selectedModel)?.description}</p>
+                    <p><strong className="text-indigo-400">Type:</strong> {models.find(m => m.id === selectedModel)?.type}</p>
+                    <p><strong className="text-indigo-400">Complexity:</strong> {models.find(m => m.id === selectedModel)?.complexity}</p>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -186,11 +205,17 @@ const MLModels = () => {
               </div>
 
               <div className="mt-6 space-y-3">
-                <button className="w-full flex items-center justify-center space-x-2 bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-lg transition-colors">
+                <button 
+                  onClick={handleSaveConfiguration}
+                  className="w-full flex items-center justify-center space-x-2 bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-lg transition-colors"
+                >
                   <Save className="w-4 h-4" />
                   <span>Save Configuration</span>
                 </button>
-                <button className="w-full flex items-center justify-center space-x-2 bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg transition-colors">
+                <button 
+                  onClick={handleTrainModel}
+                  className="w-full flex items-center justify-center space-x-2 bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg transition-colors"
+                >
                   <Play className="w-4 h-4" />
                   <span>Train Model</span>
                 </button>
