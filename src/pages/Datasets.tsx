@@ -3,6 +3,15 @@ import React, { useState, useEffect } from 'react';
 import { Database, Plus, Trash2, Download, Eye, BarChart3, Info } from 'lucide-react';
 import { useSelection } from '../contexts/SelectionContext';
 
+const getDifficultyColor = (difficulty: string) => {
+  switch (difficulty) {
+    case 'Beginner': return 'text-green-400 bg-green-500/20';
+    case 'Intermediate': return 'text-yellow-400 bg-yellow-500/20';
+    case 'Advanced': return 'text-red-400 bg-red-500/20';
+    default: return 'text-gray-400 bg-gray-500/20';
+  }
+};
+
 const Datasets = () => {
   const [datasets, setDatasets] = useState([
     { 
