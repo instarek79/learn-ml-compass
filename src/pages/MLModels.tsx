@@ -1,9 +1,11 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Settings, Sliders, Play, Save } from 'lucide-react';
+import { useSelection } from '../contexts/SelectionContext';
 
 const MLModels = () => {
   const [selectedModel, setSelectedModel] = useState<string>('linear_regression');
+  const { updateModel, updateStep } = useSelection();
+
   const [parameters, setParameters] = useState({
     learning_rate: 0.01,
     max_iterations: 1000,
@@ -18,6 +20,22 @@ const MLModels = () => {
     { id: 'svm', name: 'Support Vector Machine', type: 'Both', complexity: 'Advanced', description: 'Find optimal separating hyperplane' },
     { id: 'neural_network', name: 'Neural Network', type: 'Both', complexity: 'Advanced', description: 'Deep learning with multiple layers' },
   ];
+
+  useEffect(() => {
+    updateStep("Configuring ML Model");
+    const model = models.find(m => m.id === selectedModel);
+    if (model) {
+      updateModel(model.name);
+    }
+  }, [selectedModel, updateModel, updateStep]);
+
+  const handleModelSelect = (modelId: string) => {
+    setSelectedModel(modelId);
+    const model = models.find(m => m.id === modelId);
+    if (model) {
+      updateModel(model.name);
+    }
+  };
 
   const getComplexityColor = (complexity: string) => {
     switch (complexity) {
@@ -56,7 +74,7 @@ const MLModels = () => {
                         ? 'bg-gradient-to-r from-indigo-500/20 to-purple-500/20 border-indigo-400/50'
                         : 'bg-slate-700/50 border-slate-600 hover:bg-slate-700/70'
                     }`}
-                    onClick={() => setSelectedModel(model.id)}
+                    onClick={() => handleModelSelect(model.id)}
                   >
                     <div className="flex justify-between items-start mb-3">
                       <h3 className="text-lg font-semibold text-white">{model.name}</h3>

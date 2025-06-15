@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Sidebar } from "./components/Sidebar";
+import { SelectionProvider } from "./contexts/SelectionContext";
 import Dashboard from "./pages/Dashboard";
 import LearnAI from "./pages/LearnAI";
 import CodingArea from "./pages/CodingArea";
@@ -19,23 +20,25 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <BrowserRouter>
-        <div className="min-h-screen flex w-full">
-          <Sidebar />
-          <main className="flex-1">
-            <Routes>
-              <Route path="/" element={<Dashboard />} />
-              <Route path="/learn" element={<LearnAI />} />
-              <Route path="/code" element={<CodingArea />} />
-              <Route path="/datasets" element={<Datasets />} />
-              <Route path="/models" element={<MLModels />} />
-              <Route path="/training" element={<Dashboard />} />
-              <Route path="/progress" element={<Dashboard />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </main>
-        </div>
-      </BrowserRouter>
+      <SelectionProvider>
+        <BrowserRouter>
+          <div className="min-h-screen flex w-full">
+            <Sidebar />
+            <main className="flex-1">
+              <Routes>
+                <Route path="/" element={<Dashboard />} />
+                <Route path="/learn" element={<LearnAI />} />
+                <Route path="/code" element={<CodingArea />} />
+                <Route path="/datasets" element={<Datasets />} />
+                <Route path="/models" element={<MLModels />} />
+                <Route path="/training" element={<Dashboard />} />
+                <Route path="/progress" element={<Dashboard />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </main>
+          </div>
+        </BrowserRouter>
+      </SelectionProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );

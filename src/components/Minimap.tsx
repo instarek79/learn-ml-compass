@@ -1,18 +1,12 @@
 
 import React from 'react';
 import { Database, Settings, Target, AlertCircle } from 'lucide-react';
+import { useSelection } from '../contexts/SelectionContext';
 
-interface MinimapProps {
-  currentDataset?: string;
-  currentModel?: string;
-  currentStep?: string;
-}
+export const Minimap: React.FC = () => {
+  const { selection } = useSelection();
+  const { currentDataset, currentModel, currentStep } = selection;
 
-export const Minimap: React.FC<MinimapProps> = ({ 
-  currentDataset = "None Selected", 
-  currentModel = "None Selected",
-  currentStep = "Getting Started"
-}) => {
   return (
     <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-6 border border-slate-700 shadow-xl">
       <h3 className="text-lg font-semibold text-white mb-4 flex items-center">

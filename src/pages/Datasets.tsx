@@ -1,6 +1,7 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Database, Plus, Trash2, Download, Eye, BarChart3, Info } from 'lucide-react';
+import { useSelection } from '../contexts/SelectionContext';
 
 const Datasets = () => {
   const [datasets, setDatasets] = useState([
@@ -51,13 +52,17 @@ const Datasets = () => {
   ]);
 
   const [selectedDataset, setSelectedDataset] = useState<number | null>(1);
+  const { updateDataset, updateStep } = useSelection();
 
-  const getDifficultyColor = (difficulty: string) => {
-    switch (difficulty) {
-      case 'Beginner': return 'text-green-400 bg-green-500/20';
-      case 'Intermediate': return 'text-yellow-400 bg-yellow-500/20';
-      case 'Advanced': return 'text-red-400 bg-red-500/20';
-      default: return 'text-gray-400 bg-gray-500/20';
+  useEffect(() => {
+    updateStep("Selecting Dataset");
+  }, [updateStep]);
+
+  const handleDatasetSelect = (datasetId: number) => {
+    setSelectedDataset(datasetId);
+    const dataset = datasets.find(d => d.id === datasetId);
+    if (dataset) {
+      updateDataset(dataset.name);
     }
   };
 
@@ -123,7 +128,7 @@ const Datasets = () => {
                         ? 'bg-gradient-to-r from-purple-500/20 to-pink-500/20 border-purple-400/50'
                         : 'bg-slate-700/50 border-slate-600 hover:bg-slate-700/70'
                     }`}
-                    onClick={() => setSelectedDataset(dataset.id)}
+                    onClick={() => handleDatasetSelect(dataset.id)}
                   >
                     <div className="flex justify-between items-start mb-4">
                       <div className="flex-1">
