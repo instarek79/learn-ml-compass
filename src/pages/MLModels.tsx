@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo } from 'react';
 import { Settings, Sliders, Play, Save } from 'lucide-react';
 import { useSelection } from '../contexts/SelectionContext';
@@ -6,11 +7,70 @@ const MLModels = () => {
   const [selectedModel, setSelectedModel] = useState<string>('linear_regression');
   const { updateModel, updateStep } = useSelection();
 
-  const [parameters, setParameters] = useState({
-    learning_rate: 0.01,
-    max_iterations: 1000,
-    regularization: 0.01,
-  });
+  // Algorithm-specific parameters
+  const getModelParameters = (modelId: string) => {
+    switch (modelId) {
+      case 'linear_regression':
+        return {
+          learning_rate: 0.01,
+          max_iterations: 1000,
+          regularization_strength: 0.01,
+          fit_intercept: true,
+          normalize: false
+        };
+      case 'logistic_regression':
+        return {
+          learning_rate: 0.01,
+          max_iterations: 1000,
+          regularization: 'l2',
+          regularization_strength: 1.0,
+          tolerance: 0.0001,
+          fit_intercept: true
+        };
+      case 'decision_tree':
+        return {
+          max_depth: 5,
+          min_samples_split: 2,
+          min_samples_leaf: 1,
+          criterion: 'gini',
+          max_features: 'sqrt',
+          random_state: 42
+        };
+      case 'random_forest':
+        return {
+          n_estimators: 100,
+          max_depth: 10,
+          min_samples_split: 2,
+          min_samples_leaf: 1,
+          max_features: 'sqrt',
+          bootstrap: true,
+          random_state: 42
+        };
+      case 'svm':
+        return {
+          C: 1.0,
+          kernel: 'rbf',
+          gamma: 'scale',
+          degree: 3,
+          tolerance: 0.001,
+          max_iterations: -1
+        };
+      case 'neural_network':
+        return {
+          hidden_layer_sizes: [100, 50],
+          activation: 'relu',
+          solver: 'adam',
+          learning_rate: 0.001,
+          max_iterations: 200,
+          batch_size: 32,
+          dropout_rate: 0.2
+        };
+      default:
+        return {};
+    }
+  };
+
+  const [parameters, setParameters] = useState(getModelParameters(selectedModel));
 
   const models = useMemo(() => [
     { id: 'linear_regression', name: 'Linear Regression', type: 'Regression', complexity: 'Beginner', description: 'Simple linear relationship modeling' },
@@ -31,21 +91,27 @@ const MLModels = () => {
 
   const handleModelSelect = (modelId: string) => {
     setSelectedModel(modelId);
+    setParameters(getModelParameters(modelId));
     const model = models.find(m => m.id === modelId);
     if (model) {
       updateModel(model.name);
     }
   };
 
+  const handleParameterChange = (paramName: string, value: any) => {
+    setParameters(prev => ({
+      ...prev,
+      [paramName]: value
+    }));
+  };
+
   const handleSaveConfiguration = () => {
     console.log('Saving configuration:', { selectedModel, parameters });
-    // TODO: Implement actual save functionality
     alert('Configuration saved successfully!');
   };
 
   const handleTrainModel = () => {
     console.log('Training model:', { selectedModel, parameters });
-    // TODO: Implement actual training functionality
     alert(`Training ${models.find(m => m.id === selectedModel)?.name} with current parameters...`);
   };
 
@@ -56,6 +122,158 @@ const MLModels = () => {
       case 'Advanced': return 'text-red-400 bg-red-500/20';
       default: return 'text-gray-400 bg-gray-500/20';
     }
+  };
+
+  const renderParameterInput = (paramName: string, value: any) => {
+    // Handle different parameter types based on the parameter name and value
+    if (typeof value === 'boolean') {
+      return (
+        <div className="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            checked={value}
+            onChange={(e) => handleParameterChange(paramName, e.target.checked)}
+            className="w-4 h-4 text-indigo-600 bg-slate-700 border-slate-600 rounded focus:ring-indigo-500"
+          />
+          <span className="text-white">{value ? 'True' : 'False'}</span>
+        </div>
+      );
+    }
+
+    if (paramName.includes('regularization') && typeof value === 'string') {
+      return (
+        <select
+          value={value}
+          onChange={(e) => handleParameterChange(paramName, e.target.value)}
+          className="w-full bg-slate-700 text-white px-3 py-2 rounded-lg border border-slate-600"
+        >
+          <option value="l1">L1 (Lasso)</option>
+          <option value="l2">L2 (Ridge)</option>
+          <option value="elasticnet">Elastic Net</option>
+        </select>
+      );
+    }
+
+    if (paramName === 'criterion') {
+      return (
+        <select
+          value={value}
+          onChange={(e) => handleParameterChange(paramName, e.target.value)}
+          className="w-full bg-slate-700 text-white px-3 py-2 rounded-lg border border-slate-600"
+        >
+          <option value="gini">Gini</option>
+          <option value="entropy">Entropy</option>
+        </select>
+      );
+    }
+
+    if (paramName === 'kernel') {
+      return (
+        <select
+          value={value}
+          onChange={(e) => handleParameterChange(paramName, e.target.value)}
+          className="w-full bg-slate-700 text-white px-3 py-2 rounded-lg border border-slate-600"
+        >
+          <option value="linear">Linear</option>
+          <option value="poly">Polynomial</option>
+          <option value="rbf">RBF</option>
+          <option value="sigmoid">Sigmoid</option>
+        </select>
+      );
+    }
+
+    if (paramName === 'activation') {
+      return (
+        <select
+          value={value}
+          onChange={(e) => handleParameterChange(paramName, e.target.value)}
+          className="w-full bg-slate-700 text-white px-3 py-2 rounded-lg border border-slate-600"
+        >
+          <option value="relu">ReLU</option>
+          <option value="tanh">Tanh</option>
+          <option value="sigmoid">Sigmoid</option>
+          <option value="identity">Identity</option>
+        </select>
+      );
+    }
+
+    if (paramName === 'solver') {
+      return (
+        <select
+          value={value}
+          onChange={(e) => handleParameterChange(paramName, e.target.value)}
+          className="w-full bg-slate-700 text-white px-3 py-2 rounded-lg border border-slate-600"
+        >
+          <option value="adam">Adam</option>
+          <option value="sgd">SGD</option>
+          <option value="lbfgs">L-BFGS</option>
+        </select>
+      );
+    }
+
+    if (paramName === 'max_features') {
+      return (
+        <select
+          value={value}
+          onChange={(e) => handleParameterChange(paramName, e.target.value)}
+          className="w-full bg-slate-700 text-white px-3 py-2 rounded-lg border border-slate-600"
+        >
+          <option value="sqrt">sqrt</option>
+          <option value="log2">log2</option>
+          <option value="none">None</option>
+        </select>
+      );
+    }
+
+    // For numeric values, use appropriate input ranges
+    if (typeof value === 'number') {
+      let min = 0, max = 100, step = 1;
+      
+      if (paramName.includes('learning_rate')) {
+        min = 0.0001; max = 1; step = 0.0001;
+      } else if (paramName.includes('regularization_strength') || paramName === 'C') {
+        min = 0.001; max = 10; step = 0.001;
+      } else if (paramName.includes('tolerance')) {
+        min = 0.00001; max = 0.01; step = 0.00001;
+      } else if (paramName === 'dropout_rate') {
+        min = 0; max = 0.9; step = 0.1;
+      } else if (paramName.includes('max_depth')) {
+        min = 1; max = 50; step = 1;
+      } else if (paramName === 'n_estimators') {
+        min = 10; max = 1000; step = 10;
+      } else if (paramName.includes('max_iterations')) {
+        min = 100; max = 5000; step = 100;
+      }
+
+      return (
+        <div>
+          <input
+            type="range"
+            min={min}
+            max={max}
+            step={step}
+            value={value}
+            onChange={(e) => handleParameterChange(paramName, parseFloat(e.target.value))}
+            className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer"
+          />
+          <div className="flex justify-between text-xs text-slate-400 mt-1">
+            <span>{min}</span>
+            <span>{value}</span>
+            <span>{max}</span>
+          </div>
+        </div>
+      );
+    }
+
+    // Default text input for other types
+    return (
+      <input
+        type="text"
+        value={value}
+        onChange={(e) => handleParameterChange(paramName, e.target.value)}
+        className="w-full bg-slate-700 text-white px-3 py-2 rounded-lg border border-slate-600"
+      />
+    );
   };
 
   return (
@@ -142,66 +360,18 @@ const MLModels = () => {
             <div className="bg-gradient-to-br from-indigo-500/20 to-purple-500/20 rounded-2xl p-6 border border-indigo-400/30">
               <h3 className="text-lg font-semibold text-indigo-400 mb-4 flex items-center">
                 <Sliders className="w-5 h-5 mr-2" />
-                Model Parameters
+                {models.find(m => m.id === selectedModel)?.name} Parameters
               </h3>
               
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-white mb-2">
-                    Learning Rate: {parameters.learning_rate}
-                  </label>
-                  <input
-                    type="range"
-                    min="0.001"
-                    max="1"
-                    step="0.001"
-                    value={parameters.learning_rate}
-                    onChange={(e) => setParameters({...parameters, learning_rate: parseFloat(e.target.value)})}
-                    className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer"
-                  />
-                  <div className="flex justify-between text-xs text-slate-400 mt-1">
-                    <span>0.001</span>
-                    <span>1.0</span>
+              <div className="space-y-4 max-h-96 overflow-y-auto">
+                {Object.entries(parameters).map(([paramName, value]) => (
+                  <div key={paramName}>
+                    <label className="block text-sm font-medium text-white mb-2 capitalize">
+                      {paramName.replace(/_/g, ' ')}
+                    </label>
+                    {renderParameterInput(paramName, value)}
                   </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-white mb-2">
-                    Max Iterations: {parameters.max_iterations}
-                  </label>
-                  <input
-                    type="range"
-                    min="100"
-                    max="5000"
-                    step="100"
-                    value={parameters.max_iterations}
-                    onChange={(e) => setParameters({...parameters, max_iterations: parseInt(e.target.value)})}
-                    className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer"
-                  />
-                  <div className="flex justify-between text-xs text-slate-400 mt-1">
-                    <span>100</span>
-                    <span>5000</span>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-white mb-2">
-                    Regularization: {parameters.regularization}
-                  </label>
-                  <input
-                    type="range"
-                    min="0"
-                    max="1"
-                    step="0.01"
-                    value={parameters.regularization}
-                    onChange={(e) => setParameters({...parameters, regularization: parseFloat(e.target.value)})}
-                    className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer"
-                  />
-                  <div className="flex justify-between text-xs text-slate-400 mt-1">
-                    <span>0.0</span>
-                    <span>1.0</span>
-                  </div>
-                </div>
+                ))}
               </div>
 
               <div className="mt-6 space-y-3">
@@ -224,19 +394,56 @@ const MLModels = () => {
 
             <div className="bg-gradient-to-br from-green-500/20 to-emerald-500/20 rounded-2xl p-6 border border-green-400/30">
               <h3 className="text-lg font-semibold text-green-400 mb-4">Parameter Guide</h3>
-              <div className="space-y-3 text-sm text-white">
-                <div className="bg-white/10 rounded-lg p-3">
-                  <p className="font-medium mb-1">📈 Learning Rate</p>
-                  <p className="text-slate-300">Controls how fast the model learns. Too high = unstable, too low = slow</p>
-                </div>
-                <div className="bg-white/10 rounded-lg p-3">
-                  <p className="font-medium mb-1">🔄 Max Iterations</p>
-                  <p className="text-slate-300">Maximum training steps. More iterations = longer training time</p>
-                </div>
-                <div className="bg-white/10 rounded-lg p-3">
-                  <p className="font-medium mb-1">🎯 Regularization</p>
-                  <p className="text-slate-300">Prevents overfitting. Higher values = simpler model</p>
-                </div>
+              <div className="space-y-3 text-sm text-white max-h-64 overflow-y-auto">
+                {selectedModel === 'linear_regression' && (
+                  <>
+                    <div className="bg-white/10 rounded-lg p-3">
+                      <p className="font-medium mb-1">📈 Learning Rate</p>
+                      <p className="text-slate-300">Controls convergence speed in iterative algorithms</p>
+                    </div>
+                    <div className="bg-white/10 rounded-lg p-3">
+                      <p className="font-medium mb-1">🎯 Regularization Strength</p>
+                      <p className="text-slate-300">Prevents overfitting by penalizing large coefficients</p>
+                    </div>
+                    <div className="bg-white/10 rounded-lg p-3">
+                      <p className="font-medium mb-1">📐 Fit Intercept</p>
+                      <p className="text-slate-300">Whether to calculate the y-intercept</p>
+                    </div>
+                  </>
+                )}
+                {selectedModel === 'decision_tree' && (
+                  <>
+                    <div className="bg-white/10 rounded-lg p-3">
+                      <p className="font-medium mb-1">🌳 Max Depth</p>
+                      <p className="text-slate-300">Maximum depth of the tree to prevent overfitting</p>
+                    </div>
+                    <div className="bg-white/10 rounded-lg p-3">
+                      <p className="font-medium mb-1">🍃 Min Samples Split</p>
+                      <p className="text-slate-300">Minimum samples required to split a node</p>
+                    </div>
+                    <div className="bg-white/10 rounded-lg p-3">
+                      <p className="font-medium mb-1">📊 Criterion</p>
+                      <p className="text-slate-300">Function to measure quality of splits</p>
+                    </div>
+                  </>
+                )}
+                {selectedModel === 'neural_network' && (
+                  <>
+                    <div className="bg-white/10 rounded-lg p-3">
+                      <p className="font-medium mb-1">🧠 Hidden Layers</p>
+                      <p className="text-slate-300">Number and size of hidden layers</p>
+                    </div>
+                    <div className="bg-white/10 rounded-lg p-3">
+                      <p className="font-medium mb-1">⚡ Activation</p>
+                      <p className="text-slate-300">Function applied to neuron outputs</p>
+                    </div>
+                    <div className="bg-white/10 rounded-lg p-3">
+                      <p className="font-medium mb-1">🎲 Dropout Rate</p>
+                      <p className="text-slate-300">Percentage of neurons to ignore during training</p>
+                    </div>
+                  </>
+                )}
+                {/* Add more parameter guides for other models as needed */}
               </div>
             </div>
           </div>
