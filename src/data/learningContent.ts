@@ -394,7 +394,7 @@ print(f"Intercept: {model.intercept_:.2f}")
 # Example prediction
 new_house_size = [[2000]]
 predicted_price = model.predict(new_house_size)
-print(f"\\nPredicted price for 2000 sq ft house: ${predicted_price[0]:,.2f}")`
+print(f"\\nPredicted price for 2000 sq ft house: {predicted_price[0]:,.2f}")`
       },
       {
         id: 'classification-regression',

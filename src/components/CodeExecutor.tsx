@@ -124,7 +124,7 @@ export const CodeExecutor: React.FC<CodeExecutorProps> = ({ code, onCodeChange }
         <h4 className="text-sm font-semibold text-blue-400 mb-2">💡 Backend Setup Required</h4>
         <p className="text-xs text-slate-300">
           To execute Python code, you need to set up a Flask backend server with an endpoint at `/api/execute-python`. 
-          The server should accept POST requests with `{"code": "python_code"}` and return `{"output": "result"}` or `{"error": "error_message"}`.
+          The server should accept POST requests with {"code": "python_code"} and return {"output": "result"} or {"error": "error_message"}.
         </p>
       </div>
     </div>
