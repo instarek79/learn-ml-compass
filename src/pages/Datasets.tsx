@@ -1,7 +1,7 @@
-
 import React, { useState, useEffect } from 'react';
-import { Database, Plus, Trash2, Download, Eye, BarChart3, Info } from 'lucide-react';
+import { Database, Plus, Trash2, Download, Eye, BarChart3, Info, ArrowRight } from 'lucide-react';
 import { useSelection } from '../contexts/SelectionContext';
+import { Link } from 'react-router-dom';
 
 const getDifficultyColor = (difficulty: string) => {
   switch (difficulty) {
@@ -75,6 +75,15 @@ const Datasets = () => {
     }
   };
 
+  const handleUseDataset = () => {
+    const dataset = getSelectedDataset();
+    if (dataset) {
+      // Store dataset info for other pages
+      localStorage.setItem('selectedDataset', JSON.stringify(dataset));
+      updateDataset(dataset.name);
+    }
+  };
+
   const getSelectedDataset = () => datasets.find(d => d.id === selectedDataset);
 
   return (
@@ -92,24 +101,26 @@ const Datasets = () => {
             <p className="text-slate-300 mb-4">
               Datasets are collections of data that machine learning models learn from. Think of them as the "textbooks" 
               for AI - they contain examples that help algorithms understand patterns and make predictions on new, unseen data.
+              Here you can explore, analyze, and select datasets for your AI projects.
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
               <div>
                 <h4 className="font-semibold text-white mb-2">🎯 What You Can Do Here:</h4>
                 <ul className="text-slate-300 space-y-1">
-                  <li>• Browse curated datasets for learning</li>
-                  <li>• Preview data structure and content</li>
-                  <li>• Download datasets for your projects</li>
-                  <li>• Learn about data preprocessing</li>
+                  <li>• Browse curated datasets for learning and practice</li>
+                  <li>• Preview data structure and sample content</li>
+                  <li>• Download datasets for your AI projects</li>
+                  <li>• Learn about data preprocessing techniques</li>
+                  <li>• Navigate to coding area with selected dataset</li>
                 </ul>
               </div>
               <div>
-                <h4 className="font-semibold text-white mb-2">📈 Dataset Types:</h4>
+                <h4 className="font-semibold text-white mb-2">📈 Dataset Types Available:</h4>
                 <ul className="text-slate-300 space-y-1">
                   <li>• <strong>Classification:</strong> Predict categories (spam/not spam)</li>
                   <li>• <strong>Regression:</strong> Predict numbers (prices, temperatures)</li>
-                  <li>• <strong>Clustering:</strong> Find hidden groups in data</li>
-                  <li>• <strong>Time Series:</strong> Analyze data over time</li>
+                  <li>• <strong>Image Recognition:</strong> Classify and detect objects</li>
+                  <li>• <strong>Natural Language:</strong> Process and understand text</li>
                 </ul>
               </div>
             </div>
@@ -205,7 +216,7 @@ const Datasets = () => {
             </div>
           </div>
 
-          {/* Dataset Details */}
+          {/* Dataset Details Sidebar */}
           <div className="space-y-6">
             <div className="bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-2xl p-6 border border-purple-400/30">
               <h3 className="text-lg font-semibold text-purple-400 mb-4">📋 Dataset Preview</h3>
@@ -243,6 +254,15 @@ const Datasets = () => {
                         <div className="text-slate-500">... {getSelectedDataset()?.rows - 3} more rows</div>
                       </div>
                     )}
+                    {selectedDataset === 4 && (
+                      <div className="text-white space-y-1">
+                        <div className="text-cyan-400">acidity | sugar | alcohol | pH | quality</div>
+                        <div>0.27 | 0.36 | 20.7 | 2.78 | 6</div>
+                        <div>0.30 | 0.34 | 20.6 | 2.80 | 6</div>
+                        <div>0.28 | 0.40 | 20.9 | 2.81 | 6</div>
+                        <div className="text-slate-500">... {getSelectedDataset()?.rows - 3} more rows</div>
+                      </div>
+                    )}
                   </div>
                   
                   <div className="space-y-2">
@@ -256,12 +276,38 @@ const Datasets = () => {
                     </div>
                   </div>
                   
-                  <button className="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 rounded-lg transition-colors">
-                    Use This Dataset
-                  </button>
+                  <div className="space-y-3">
+                    <button 
+                      onClick={handleUseDataset}
+                      className="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 rounded-lg transition-colors"
+                    >
+                      Use This Dataset
+                    </button>
+                    
+                    <div className="grid grid-cols-2 gap-2">
+                      <Link 
+                        to="/code"
+                        onClick={handleUseDataset}
+                        className="flex items-center justify-center space-x-1 bg-green-600 hover:bg-green-700 text-white py-2 px-3 rounded-lg transition-colors text-sm"
+                      >
+                        <span>🐍</span>
+                        <span>Code</span>
+                        <ArrowRight className="w-3 h-3" />
+                      </Link>
+                      <Link 
+                        to="/models"
+                        onClick={handleUseDataset}
+                        className="flex items-center justify-center space-x-1 bg-orange-600 hover:bg-orange-700 text-white py-2 px-3 rounded-lg transition-colors text-sm"
+                      >
+                        <span>🤖</span>
+                        <span>Models</span>
+                        <ArrowRight className="w-3 h-3" />
+                      </Link>
+                    </div>
+                  </div>
                 </div>
               ) : (
-                <p className="text-slate-400">Select a dataset to preview its content</p>
+                <p className="text-slate-400">Select a dataset to preview its content and features</p>
               )}
             </div>
 
