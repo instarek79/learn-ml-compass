@@ -221,11 +221,13 @@ export const ConfigPanel: React.FC<ConfigPanelProps> = ({ selectedNode }) => {
     }
   };
 
+  const nodeLabel = typeof selectedNode.data?.label === 'string' ? selectedNode.data.label : selectedNode.type;
+
   return (
     <Card>
       <CardHeader>
         <CardTitle className="text-sm">
-          Configure: {selectedNode.data?.label || selectedNode.type}
+          Configure: {nodeLabel}
         </CardTitle>
       </CardHeader>
       <CardContent>
