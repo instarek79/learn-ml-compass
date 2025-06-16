@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Brain, Database, Settings, BookOpen, Play, BarChart3, Target, Home } from 'lucide-react';
+import { Brain, Database, Settings, BookOpen, Play, BarChart3, Target, Home, Gamepad2 } from 'lucide-react';
 import { useLocation, Link } from 'react-router-dom';
 
 const navItems = [
@@ -9,6 +9,7 @@ const navItems = [
   { icon: Play, label: 'Coding Area', path: '/code' },
   { icon: Database, label: 'Datasets', path: '/datasets' },
   { icon: Settings, label: 'ML Models', path: '/models' },
+  { icon: Gamepad2, label: 'ML Playground', path: '/playground' },
   { icon: BarChart3, label: 'Training', path: '/training' },
   { icon: Target, label: 'Progress', path: '/progress' },
 ];
@@ -55,7 +56,7 @@ export const Sidebar = () => {
       <div className="mt-12 p-4 bg-gradient-to-r from-cyan-500/10 to-pink-500/10 rounded-xl border border-cyan-400/20">
         <h3 className="text-sm font-semibold text-cyan-400 mb-2">Quick Tip</h3>
         <p className="text-xs text-purple-200">
-          Start with the Learn AI section to understand the fundamentals before diving into coding!
+          Try the ML Playground to build visual machine learning pipelines with drag-and-drop!
         </p>
       </div>
     </div>

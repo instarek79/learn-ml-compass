@@ -38,6 +38,7 @@ const App = () => {
                     <Route path="/code" element={<CodingArea />} />
                     <Route path="/datasets" element={<Datasets />} />
                     <Route path="/models" element={<MLModels />} />
+                    <Route path="/playground" element={<MLPlayground />} />
                     <Route path="/training" element={<Dashboard />} />
                     <Route path="/progress" element={<Dashboard />} />
                     <Route path="*" element={<NotFound />} />
