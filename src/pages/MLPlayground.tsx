@@ -1,4 +1,3 @@
-
 import React, { useCallback, useState } from 'react';
 import {
   ReactFlow,
@@ -27,6 +26,7 @@ import { NodePalette } from '@/components/playground/NodePalette';
 import { ConfigDialog } from '@/components/playground/ConfigDialog';
 import { ExecutionPanel } from '@/components/playground/ExecutionPanel';
 import { usePlaygroundStore } from '@/stores/playgroundStore';
+import { AnimatedDemo } from '@/components/playground/AnimatedDemo';
 
 const nodeTypes = {
   dataInput: DataInputNode,
@@ -47,6 +47,7 @@ const MLPlaygroundContent = () => {
   const [isConfigOpen, setIsConfigOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [showExecution, setShowExecution] = useState(false);
+  const [showDemo, setShowDemo] = useState(false);
   
   const { 
     isExecuting, 
@@ -108,6 +109,14 @@ const MLPlaygroundContent = () => {
           <h1 className="text-2xl font-bold text-gray-900">ML Playground</h1>
         </div>
         <div className="flex gap-2">
+          <Button
+            variant="outline"
+            onClick={() => setShowDemo(true)}
+            className="flex items-center gap-2"
+          >
+            <Play className="h-4 w-4" />
+            Demo
+          </Button>
           <Button
             onClick={handleExecute}
             disabled={isExecuting}
@@ -208,6 +217,12 @@ const MLPlaygroundContent = () => {
             )
           );
         }}
+      />
+
+      {/* Animated Demo */}
+      <AnimatedDemo
+        isOpen={showDemo}
+        onClose={() => setShowDemo(false)}
       />
     </div>
   );
