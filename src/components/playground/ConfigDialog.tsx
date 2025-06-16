@@ -25,6 +25,35 @@ interface ConfigDialogProps {
   onUpdateNode: (nodeId: string, updates: any) => void;
 }
 
+interface CNNParams {
+  layers: number;
+  filters: number;
+  kernelSize: number;
+  dropout: number;
+  activation: string;
+}
+
+interface SVMParams {
+  kernel: string;
+  C: number;
+  gamma: string;
+  degree: number;
+}
+
+interface RFParams {
+  nEstimators: number;
+  maxDepth: number;
+  minSamplesSplit: number;
+  minSamplesLeaf: number;
+}
+
+interface MobileNetParams {
+  alpha: number;
+  inputShape: number;
+  includeTop: boolean;
+  freezeLayers: number;
+}
+
 const nodeHints = {
   dataInput: "Upload your training data here. Support for images, audio, and text. Make sure your data is properly labeled and organized into classes.",
   preprocessing: "Clean and prepare your data for training. This step is crucial for model performance. Consider normalization, augmentation, and proper sizing.",
@@ -40,7 +69,7 @@ export const ConfigDialog: React.FC<ConfigDialogProps> = ({
   onClose,
   onUpdateNode 
 }) => {
-  const [selectedAlgorithm, setSelectedAlgorithm] = useState('cnn');
+  const [selectedAlgorithm, setSelectedAlgorithm] = useState<'cnn' | 'svm' | 'rf' | 'mobilenet'>('cnn');
   const [fineTuningParams, setFineTuningParams] = useState({
     cnn: {
       layers: 3,
@@ -48,25 +77,25 @@ export const ConfigDialog: React.FC<ConfigDialogProps> = ({
       kernelSize: 3,
       dropout: 0.2,
       activation: 'relu'
-    },
+    } as CNNParams,
     svm: {
       kernel: 'rbf',
       C: 1.0,
       gamma: 'scale',
       degree: 3
-    },
+    } as SVMParams,
     rf: {
       nEstimators: 100,
       maxDepth: 10,
       minSamplesSplit: 2,
       minSamplesLeaf: 1
-    },
+    } as RFParams,
     mobilenet: {
       alpha: 1.0,
       inputShape: 224,
       includeTop: false,
       freezeLayers: 50
-    }
+    } as MobileNetParams
   });
 
   if (!selectedNode) return null;
@@ -83,16 +112,17 @@ export const ConfigDialog: React.FC<ConfigDialogProps> = ({
   );
 
   const renderAlgorithmFineTuning = () => {
-    const params = fineTuningParams[selectedAlgorithm as keyof typeof fineTuningParams];
+    const params = fineTuningParams[selectedAlgorithm];
     
     switch (selectedAlgorithm) {
       case 'cnn':
+        const cnnParams = params as CNNParams;
         return (
           <div className="space-y-4">
             <div>
-              <Label>Number of Layers: {params.layers}</Label>
+              <Label>Number of Layers: {cnnParams.layers}</Label>
               <Slider
-                value={[params.layers]}
+                value={[cnnParams.layers]}
                 onValueChange={([value]) => setFineTuningParams(prev => ({
                   ...prev,
                   cnn: { ...prev.cnn, layers: value }
@@ -104,9 +134,9 @@ export const ConfigDialog: React.FC<ConfigDialogProps> = ({
               />
             </div>
             <div>
-              <Label>Filters: {params.filters}</Label>
+              <Label>Filters: {cnnParams.filters}</Label>
               <Slider
-                value={[params.filters]}
+                value={[cnnParams.filters]}
                 onValueChange={([value]) => setFineTuningParams(prev => ({
                   ...prev,
                   cnn: { ...prev.cnn, filters: value }
@@ -118,9 +148,9 @@ export const ConfigDialog: React.FC<ConfigDialogProps> = ({
               />
             </div>
             <div>
-              <Label>Kernel Size: {params.kernelSize}</Label>
+              <Label>Kernel Size: {cnnParams.kernelSize}</Label>
               <Slider
-                value={[params.kernelSize]}
+                value={[cnnParams.kernelSize]}
                 onValueChange={([value]) => setFineTuningParams(prev => ({
                   ...prev,
                   cnn: { ...prev.cnn, kernelSize: value }
@@ -132,9 +162,9 @@ export const ConfigDialog: React.FC<ConfigDialogProps> = ({
               />
             </div>
             <div>
-              <Label>Dropout Rate: {params.dropout}</Label>
+              <Label>Dropout Rate: {cnnParams.dropout}</Label>
               <Slider
-                value={[params.dropout]}
+                value={[cnnParams.dropout]}
                 onValueChange={([value]) => setFineTuningParams(prev => ({
                   ...prev,
                   cnn: { ...prev.cnn, dropout: value }
@@ -147,7 +177,7 @@ export const ConfigDialog: React.FC<ConfigDialogProps> = ({
             </div>
             <div>
               <Label htmlFor="activation">Activation Function</Label>
-              <Select value={params.activation} onValueChange={(value) => 
+              <Select value={cnnParams.activation} onValueChange={(value) => 
                 setFineTuningParams(prev => ({
                   ...prev,
                   cnn: { ...prev.cnn, activation: value }
@@ -168,11 +198,12 @@ export const ConfigDialog: React.FC<ConfigDialogProps> = ({
         );
       
       case 'svm':
+        const svmParams = params as SVMParams;
         return (
           <div className="space-y-4">
             <div>
               <Label htmlFor="kernel">Kernel</Label>
-              <Select value={params.kernel} onValueChange={(value) => 
+              <Select value={svmParams.kernel} onValueChange={(value) => 
                 setFineTuningParams(prev => ({
                   ...prev,
                   svm: { ...prev.svm, kernel: value }
@@ -190,9 +221,9 @@ export const ConfigDialog: React.FC<ConfigDialogProps> = ({
               </Select>
             </div>
             <div>
-              <Label>C (Regularization): {params.C}</Label>
+              <Label>C (Regularization): {svmParams.C}</Label>
               <Slider
-                value={[params.C]}
+                value={[svmParams.C]}
                 onValueChange={([value]) => setFineTuningParams(prev => ({
                   ...prev,
                   svm: { ...prev.svm, C: value }
@@ -205,7 +236,7 @@ export const ConfigDialog: React.FC<ConfigDialogProps> = ({
             </div>
             <div>
               <Label htmlFor="gamma">Gamma</Label>
-              <Select value={params.gamma} onValueChange={(value) => 
+              <Select value={svmParams.gamma} onValueChange={(value) => 
                 setFineTuningParams(prev => ({
                   ...prev,
                   svm: { ...prev.svm, gamma: value }
@@ -220,11 +251,11 @@ export const ConfigDialog: React.FC<ConfigDialogProps> = ({
                 </SelectContent>
               </Select>
             </div>
-            {params.kernel === 'poly' && (
+            {svmParams.kernel === 'poly' && (
               <div>
-                <Label>Degree: {params.degree}</Label>
+                <Label>Degree: {svmParams.degree}</Label>
                 <Slider
-                  value={[params.degree]}
+                  value={[svmParams.degree]}
                   onValueChange={([value]) => setFineTuningParams(prev => ({
                     ...prev,
                     svm: { ...prev.svm, degree: value }
@@ -240,12 +271,13 @@ export const ConfigDialog: React.FC<ConfigDialogProps> = ({
         );
       
       case 'rf':
+        const rfParams = params as RFParams;
         return (
           <div className="space-y-4">
             <div>
-              <Label>Number of Estimators: {params.nEstimators}</Label>
+              <Label>Number of Estimators: {rfParams.nEstimators}</Label>
               <Slider
-                value={[params.nEstimators]}
+                value={[rfParams.nEstimators]}
                 onValueChange={([value]) => setFineTuningParams(prev => ({
                   ...prev,
                   rf: { ...prev.rf, nEstimators: value }
@@ -257,9 +289,9 @@ export const ConfigDialog: React.FC<ConfigDialogProps> = ({
               />
             </div>
             <div>
-              <Label>Max Depth: {params.maxDepth}</Label>
+              <Label>Max Depth: {rfParams.maxDepth}</Label>
               <Slider
-                value={[params.maxDepth]}
+                value={[rfParams.maxDepth]}
                 onValueChange={([value]) => setFineTuningParams(prev => ({
                   ...prev,
                   rf: { ...prev.rf, maxDepth: value }
@@ -271,9 +303,9 @@ export const ConfigDialog: React.FC<ConfigDialogProps> = ({
               />
             </div>
             <div>
-              <Label>Min Samples Split: {params.minSamplesSplit}</Label>
+              <Label>Min Samples Split: {rfParams.minSamplesSplit}</Label>
               <Slider
-                value={[params.minSamplesSplit]}
+                value={[rfParams.minSamplesSplit]}
                 onValueChange={([value]) => setFineTuningParams(prev => ({
                   ...prev,
                   rf: { ...prev.rf, minSamplesSplit: value }
@@ -288,12 +320,13 @@ export const ConfigDialog: React.FC<ConfigDialogProps> = ({
         );
       
       case 'mobilenet':
+        const mobileNetParams = params as MobileNetParams;
         return (
           <div className="space-y-4">
             <div>
-              <Label>Alpha (Width Multiplier): {params.alpha}</Label>
+              <Label>Alpha (Width Multiplier): {mobileNetParams.alpha}</Label>
               <Slider
-                value={[params.alpha]}
+                value={[mobileNetParams.alpha]}
                 onValueChange={([value]) => setFineTuningParams(prev => ({
                   ...prev,
                   mobilenet: { ...prev.mobilenet, alpha: value }
@@ -305,9 +338,9 @@ export const ConfigDialog: React.FC<ConfigDialogProps> = ({
               />
             </div>
             <div>
-              <Label>Input Shape: {params.inputShape}x{params.inputShape}</Label>
+              <Label>Input Shape: {mobileNetParams.inputShape}x{mobileNetParams.inputShape}</Label>
               <Slider
-                value={[params.inputShape]}
+                value={[mobileNetParams.inputShape]}
                 onValueChange={([value]) => setFineTuningParams(prev => ({
                   ...prev,
                   mobilenet: { ...prev.mobilenet, inputShape: value }
@@ -319,9 +352,9 @@ export const ConfigDialog: React.FC<ConfigDialogProps> = ({
               />
             </div>
             <div>
-              <Label>Freeze Layers: {params.freezeLayers}</Label>
+              <Label>Freeze Layers: {mobileNetParams.freezeLayers}</Label>
               <Slider
-                value={[params.freezeLayers]}
+                value={[mobileNetParams.freezeLayers]}
                 onValueChange={([value]) => setFineTuningParams(prev => ({
                   ...prev,
                   mobilenet: { ...prev.mobilenet, freezeLayers: value }
@@ -335,7 +368,7 @@ export const ConfigDialog: React.FC<ConfigDialogProps> = ({
             <div className="flex items-center justify-between">
               <Label htmlFor="includeTop">Include Top Layer</Label>
               <Switch 
-                checked={params.includeTop}
+                checked={mobileNetParams.includeTop}
                 onCheckedChange={(checked) => setFineTuningParams(prev => ({
                   ...prev,
                   mobilenet: { ...prev.mobilenet, includeTop: checked }
@@ -420,7 +453,7 @@ export const ConfigDialog: React.FC<ConfigDialogProps> = ({
                 <div className="space-y-4">
                   <div>
                     <Label htmlFor="algorithm">Algorithm</Label>
-                    <Select value={selectedAlgorithm} onValueChange={setSelectedAlgorithm}>
+                    <Select value={selectedAlgorithm} onValueChange={(value: 'cnn' | 'svm' | 'rf' | 'mobilenet') => setSelectedAlgorithm(value)}>
                       <SelectTrigger>
                         <SelectValue placeholder="Select algorithm" />
                       </SelectTrigger>
