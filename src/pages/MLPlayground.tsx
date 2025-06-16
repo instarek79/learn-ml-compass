@@ -11,6 +11,7 @@ import {
   Connection,
   Edge,
   Node,
+  ReactFlowProvider,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { Button } from '@/components/ui/button';
@@ -40,7 +41,7 @@ const nodeTypes = {
 const initialNodes: Node[] = [];
 const initialEdges: Edge[] = [];
 
-const MLPlayground = () => {
+const MLPlaygroundContent = () => {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const [selectedNode, setSelectedNode] = useState<Node | null>(null);
@@ -173,6 +174,14 @@ const MLPlayground = () => {
         </div>
       </div>
     </div>
+  );
+};
+
+const MLPlayground = () => {
+  return (
+    <ReactFlowProvider>
+      <MLPlaygroundContent />
+    </ReactFlowProvider>
   );
 };
 
