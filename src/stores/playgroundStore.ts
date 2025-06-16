@@ -42,48 +42,78 @@ export const usePlaygroundStore = create<PlaygroundState>((set, get) => ({
         return;
       }
 
-      // Find start node (data input)
-      const startNode = nodes.find(node => node.type === 'dataInput');
-      if (!startNode) {
-        addLog({ type: 'error', message: 'No data input node found' });
+      // Find start nodes (data input nodes)
+      const startNodes = nodes.filter(node => node.type === 'dataInput');
+      if (startNodes.length === 0) {
+        addLog({ type: 'error', message: 'No data input node found. Please add a Data Input node to start your pipeline.' });
         return;
       }
 
+      addLog({ type: 'info', message: `Found ${startNodes.length} data input node(s)` });
       addLog({ type: 'info', message: 'Pipeline validation successful' });
 
-      // Execute nodes in order
-      const executedNodes = new Set<string>();
-      const executeNode = async (nodeId: string) => {
-        if (executedNodes.has(nodeId)) return;
+      // Build execution order using topological sort
+      const getExecutionOrder = (nodes: Node[], edges: Edge[]) => {
+        const inDegree = new Map<string, number>();
+        const adjList = new Map<string, string[]>();
         
-        const node = nodes.find(n => n.id === nodeId);
-        if (!node) return;
+        // Initialize
+        nodes.forEach(node => {
+          inDegree.set(node.id, 0);
+          adjList.set(node.id, []);
+        });
+        
+        // Build graph
+        edges.forEach(edge => {
+          adjList.get(edge.source)?.push(edge.target);
+          inDegree.set(edge.target, (inDegree.get(edge.target) || 0) + 1);
+        });
+        
+        // Topological sort
+        const queue = nodes.filter(node => inDegree.get(node.id) === 0);
+        const result: Node[] = [];
+        
+        while (queue.length > 0) {
+          const current = queue.shift()!;
+          result.push(current);
+          
+          adjList.get(current.id)?.forEach(neighborId => {
+            const newInDegree = (inDegree.get(neighborId) || 0) - 1;
+            inDegree.set(neighborId, newInDegree);
+            
+            if (newInDegree === 0) {
+              const neighborNode = nodes.find(n => n.id === neighborId);
+              if (neighborNode) queue.push(neighborNode);
+            }
+          });
+        }
+        
+        return result;
+      };
 
+      const executionOrder = getExecutionOrder(nodes, edges);
+      addLog({ type: 'info', message: `Execution order determined: ${executionOrder.length} nodes` });
+
+      // Execute nodes in order
+      for (const node of executionOrder) {
         addLog({ 
           type: 'info', 
           message: `Executing ${node.type} node: ${node.data?.label || node.id}`,
           nodeId: node.id
         });
 
-        // Simulate node execution
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        // Simulate node execution with different delays for different node types
+        const executionTime = getExecutionTime(node.type);
+        await new Promise(resolve => setTimeout(resolve, executionTime));
         
-        executedNodes.add(nodeId);
         addLog({ 
           type: 'success', 
-          message: `Completed ${node.type} node`,
+          message: `✓ Completed ${node.type} node${getNodeResultMessage(node.type)}`,
           nodeId: node.id
         });
+      }
 
-        // Execute connected nodes
-        const connectedEdges = edges.filter(edge => edge.source === nodeId);
-        for (const edge of connectedEdges) {
-          await executeNode(edge.target);
-        }
-      };
-
-      await executeNode(startNode.id);
-      addLog({ type: 'success', message: 'Pipeline execution completed successfully!' });
+      addLog({ type: 'success', message: '🎉 Pipeline execution completed successfully!' });
 
     } catch (error) {
       addLog({ 
@@ -125,3 +155,28 @@ export const usePlaygroundStore = create<PlaygroundState>((set, get) => ({
     set({ currentPipeline: pipeline });
   },
 }));
+
+// Helper functions
+const getExecutionTime = (nodeType: string): number => {
+  switch (nodeType) {
+    case 'dataInput': return 800;
+    case 'preprocessing': return 1200;
+    case 'model': return 1500;
+    case 'training': return 2000;
+    case 'evaluation': return 1000;
+    case 'output': return 600;
+    default: return 1000;
+  }
+};
+
+const getNodeResultMessage = (nodeType: string): string => {
+  switch (nodeType) {
+    case 'dataInput': return ' - Data loaded successfully';
+    case 'preprocessing': return ' - Data preprocessed and ready';
+    case 'model': return ' - Model architecture defined';
+    case 'training': return ' - Model training completed';
+    case 'evaluation': return ' - Model evaluation finished';
+    case 'output': return ' - Results exported';
+    default: return '';
+  }
+};
