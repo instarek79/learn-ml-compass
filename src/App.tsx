@@ -13,6 +13,7 @@ import LearnAI from "./pages/LearnAI";
 import CodingArea from "./pages/CodingArea";
 import Datasets from "./pages/Datasets";
 import MLModels from "./pages/MLModels";
+import MLPlayground from "./pages/MLPlayground";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
