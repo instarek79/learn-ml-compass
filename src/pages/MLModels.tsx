@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo } from 'react';
 import { Settings, Sliders, Play, Save } from 'lucide-react';
 import { useSelection } from '../contexts/SelectionContext';
@@ -125,7 +124,6 @@ const MLModels = () => {
   };
 
   const renderParameterInput = (paramName: string, value: any) => {
-    // Handle different parameter types based on the parameter name and value
     if (typeof value === 'boolean') {
       return (
         <div className="flex items-center space-x-2">
@@ -225,7 +223,6 @@ const MLModels = () => {
       );
     }
 
-    // For numeric values, use appropriate input ranges
     if (typeof value === 'number') {
       let min = 0, max = 100, step = 1;
       
@@ -265,7 +262,6 @@ const MLModels = () => {
       );
     }
 
-    // Default text input for other types
     return (
       <input
         type="text"
@@ -325,7 +321,6 @@ const MLModels = () => {
                 ))}
               </div>
 
-              {/* Current Model Details */}
               <div className="mt-8 p-6 bg-gradient-to-r from-indigo-500/10 to-purple-500/10 rounded-xl border border-indigo-400/20">
                 <h3 className="text-lg font-semibold text-white mb-4">Model Information</h3>
                 {selectedModel === 'linear_regression' && (
@@ -399,51 +394,179 @@ const MLModels = () => {
                   <>
                     <div className="bg-white/10 rounded-lg p-3">
                       <p className="font-medium mb-1">📈 Learning Rate</p>
-                      <p className="text-slate-300">Controls convergence speed in iterative algorithms</p>
+                      <p className="text-slate-300">Controls how fast the algorithm learns. Higher values = faster learning but may overshoot optimal solution. Lower values = more stable but slower convergence.</p>
+                    </div>
+                    <div className="bg-white/10 rounded-lg p-3">
+                      <p className="font-medium mb-1">🔄 Max Iterations</p>
+                      <p className="text-slate-300">Maximum number of training steps. More iterations allow better learning but take longer time. Stop early if convergence is reached.</p>
                     </div>
                     <div className="bg-white/10 rounded-lg p-3">
                       <p className="font-medium mb-1">🎯 Regularization Strength</p>
-                      <p className="text-slate-300">Prevents overfitting by penalizing large coefficients</p>
+                      <p className="text-slate-300">Prevents overfitting by penalizing large coefficients. Higher values = simpler model but may underfit. Lower values = more complex model but may overfit.</p>
                     </div>
                     <div className="bg-white/10 rounded-lg p-3">
                       <p className="font-medium mb-1">📐 Fit Intercept</p>
-                      <p className="text-slate-300">Whether to calculate the y-intercept</p>
+                      <p className="text-slate-300">Whether to calculate the y-intercept (bias term). Usually True unless you're sure your data passes through origin (0,0).</p>
+                    </div>
+                    <div className="bg-white/10 rounded-lg p-3">
+                      <p className="font-medium mb-1">⚖️ Normalize</p>
+                      <p className="text-slate-300">Scales input features to have similar ranges. Helpful when features have very different scales (e.g., age vs income).</p>
                     </div>
                   </>
                 )}
+                
+                {selectedModel === 'logistic_regression' && (
+                  <>
+                    <div className="bg-white/10 rounded-lg p-3">
+                      <p className="font-medium mb-1">📈 Learning Rate</p>
+                      <p className="text-slate-300">Step size for gradient descent. Too high = unstable training, too low = slow convergence. Typical range: 0.001-0.1.</p>
+                    </div>
+                    <div className="bg-white/10 rounded-lg p-3">
+                      <p className="font-medium mb-1">🔄 Max Iterations</p>
+                      <p className="text-slate-300">Maximum training epochs. More iterations = better convergence but longer training time. Monitor for convergence.</p>
+                    </div>
+                    <div className="bg-white/10 rounded-lg p-3">
+                      <p className="font-medium mb-1">🛡️ Regularization</p>
+                      <p className="text-slate-300">L1 (Lasso) creates sparse models by zeroing coefficients. L2 (Ridge) shrinks coefficients smoothly. Elastic Net combines both.</p>
+                    </div>
+                    <div className="bg-white/10 rounded-lg p-3">
+                      <p className="font-medium mb-1">🎯 Regularization Strength</p>
+                      <p className="text-slate-300">Controls regularization intensity. Higher = simpler model, lower = more complex. Balance between underfitting and overfitting.</p>
+                    </div>
+                    <div className="bg-white/10 rounded-lg p-3">
+                      <p className="font-medium mb-1">⏹️ Tolerance</p>
+                      <p className="text-slate-300">Stopping criterion for optimization. Smaller values = more precise but longer training. Typical: 1e-4 to 1e-6.</p>
+                    </div>
+                    <div className="bg-white/10 rounded-lg p-3">
+                      <p className="font-medium mb-1">📐 Fit Intercept</p>
+                      <p className="text-slate-300">Adds bias term to model. Usually True for most real-world problems unless data is pre-centered.</p>
+                    </div>
+                  </>
+                )}
+
                 {selectedModel === 'decision_tree' && (
                   <>
                     <div className="bg-white/10 rounded-lg p-3">
                       <p className="font-medium mb-1">🌳 Max Depth</p>
-                      <p className="text-slate-300">Maximum depth of the tree to prevent overfitting</p>
+                      <p className="text-slate-300">Maximum tree depth. Deeper trees can model complex patterns but may overfit. Shallow trees are simpler but may underfit.</p>
                     </div>
                     <div className="bg-white/10 rounded-lg p-3">
                       <p className="font-medium mb-1">🍃 Min Samples Split</p>
-                      <p className="text-slate-300">Minimum samples required to split a node</p>
+                      <p className="text-slate-300">Minimum samples required to split a node. Higher values prevent overfitting by requiring more evidence for splits.</p>
+                    </div>
+                    <div className="bg-white/10 rounded-lg p-3">
+                      <p className="font-medium mb-1">🌱 Min Samples Leaf</p>
+                      <p className="text-slate-300">Minimum samples in leaf nodes. Higher values create smoother decision boundaries and reduce overfitting.</p>
                     </div>
                     <div className="bg-white/10 rounded-lg p-3">
                       <p className="font-medium mb-1">📊 Criterion</p>
-                      <p className="text-slate-300">Function to measure quality of splits</p>
+                      <p className="text-slate-300">Split quality measure. Gini: faster, good default. Entropy: more precise, computationally expensive. Both measure impurity.</p>
+                    </div>
+                    <div className="bg-white/10 rounded-lg p-3">
+                      <p className="font-medium mb-1">🎲 Max Features</p>
+                      <p className="text-slate-300">Features considered for best split. 'sqrt' uses square root of total features, good for reducing overfitting and correlation.</p>
+                    </div>
+                    <div className="bg-white/10 rounded-lg p-3">
+                      <p className="font-medium mb-1">🎯 Random State</p>
+                      <p className="text-slate-300">Seed for reproducibility. Same value = same results across runs. Important for debugging and comparison.</p>
                     </div>
                   </>
                 )}
+
+                {selectedModel === 'random_forest' && (
+                  <>
+                    <div className="bg-white/10 rounded-lg p-3">
+                      <p className="font-medium mb-1">🌲 N Estimators</p>
+                      <p className="text-slate-300">Number of trees in the forest. More trees = better performance but slower training. Typical range: 50-500.</p>
+                    </div>
+                    <div className="bg-white/10 rounded-lg p-3">
+                      <p className="font-medium mb-1">🌳 Max Depth</p>
+                      <p className="text-slate-300">Maximum depth per tree. Deeper = more complex patterns but risk overfitting. Often set higher than single decision tree.</p>
+                    </div>
+                    <div className="bg-white/10 rounded-lg p-3">
+                      <p className="font-medium mb-1">🍃 Min Samples Split</p>
+                      <p className="text-slate-300">Minimum samples to split internal nodes. Higher values reduce overfitting by requiring more evidence for splits.</p>
+                    </div>
+                    <div className="bg-white/10 rounded-lg p-3">
+                      <p className="font-medium mb-1">🌱 Min Samples Leaf</p>
+                      <p className="text-slate-300">Minimum samples in leaf nodes. Controls tree complexity and prevents overly specific rules.</p>
+                    </div>
+                    <div className="bg-white/10 rounded-lg p-3">
+                      <p className="font-medium mb-1">🎲 Max Features</p>
+                      <p className="text-slate-300">Random feature subset size. 'sqrt' reduces correlation between trees, improving ensemble diversity and performance.</p>
+                    </div>
+                    <div className="bg-white/10 rounded-lg p-3">
+                      <p className="font-medium mb-1">👢 Bootstrap</p>
+                      <p className="text-slate-300">Sample with replacement for each tree. Creates diversity by training trees on different data subsets.</p>
+                    </div>
+                    <div className="bg-white/10 rounded-lg p-3">
+                      <p className="font-medium mb-1">🎯 Random State</p>
+                      <p className="text-slate-300">Controls randomness for reproducible results. Important for comparing different parameter settings.</p>
+                    </div>
+                  </>
+                )}
+
+                {selectedModel === 'svm' && (
+                  <>
+                    <div className="bg-white/10 rounded-lg p-3">
+                      <p className="font-medium mb-1">⚖️ C (Regularization)</p>
+                      <p className="text-slate-300">Controls trade-off between smooth decision boundary and classifying training points correctly. Higher C = less regularization.</p>
+                    </div>
+                    <div className="bg-white/10 rounded-lg p-3">
+                      <p className="font-medium mb-1">🔧 Kernel</p>
+                      <p className="text-slate-300">Transforms data to higher dimensions. Linear: fast, simple. RBF: handles non-linear patterns. Poly: polynomial relationships.</p>
+                    </div>
+                    <div className="bg-white/10 rounded-lg p-3">
+                      <p className="font-medium mb-1">🎛️ Gamma</p>
+                      <p className="text-slate-300">Kernel coefficient for RBF/poly. Higher = more complex decision boundary. 'Scale' uses 1/(n_features * X.var()).</p>
+                    </div>
+                    <div className="bg-white/10 rounded-lg p-3">
+                      <p className="font-medium mb-1">📐 Degree</p>
+                      <p className="text-slate-300">Polynomial degree for 'poly' kernel. Higher degrees capture more complex relationships but risk overfitting.</p>
+                    </div>
+                    <div className="bg-white/10 rounded-lg p-3">
+                      <p className="font-medium mb-1">⏹️ Tolerance</p>
+                      <p className="text-slate-300">Stopping criterion precision. Smaller = more accurate but slower training. Balance accuracy vs speed.</p>
+                    </div>
+                    <div className="bg-white/10 rounded-lg p-3">
+                      <p className="font-medium mb-1">🔄 Max Iterations</p>
+                      <p className="text-slate-300">Maximum solver iterations. -1 = no limit. Increase if solver doesn't converge on complex problems.</p>
+                    </div>
+                  </>
+                )}
+
                 {selectedModel === 'neural_network' && (
                   <>
                     <div className="bg-white/10 rounded-lg p-3">
-                      <p className="font-medium mb-1">🧠 Hidden Layers</p>
-                      <p className="text-slate-300">Number and size of hidden layers</p>
+                      <p className="font-medium mb-1">🧠 Hidden Layer Sizes</p>
+                      <p className="text-slate-300">Architecture of hidden layers. More layers/neurons = more complex patterns but slower training and overfitting risk.</p>
                     </div>
                     <div className="bg-white/10 rounded-lg p-3">
-                      <p className="font-medium mb-1">⚡ Activation</p>
-                      <p className="text-slate-300">Function applied to neuron outputs</p>
+                      <p className="font-medium mb-1">⚡ Activation Function</p>
+                      <p className="text-slate-300">Neuron activation. ReLU: fast, good default. Tanh: handles negative values. Sigmoid: outputs 0-1 range.</p>
+                    </div>
+                    <div className="bg-white/10 rounded-lg p-3">
+                      <p className="font-medium mb-1">🔧 Solver</p>
+                      <p className="text-slate-300">Optimization algorithm. Adam: adaptive, good default. SGD: simple, needs tuning. L-BFGS: good for small datasets.</p>
+                    </div>
+                    <div className="bg-white/10 rounded-lg p-3">
+                      <p className="font-medium mb-1">📈 Learning Rate</p>
+                      <p className="text-slate-300">Step size for weight updates. Higher = faster but unstable. Lower = stable but slow. Adam adapts automatically.</p>
+                    </div>
+                    <div className="bg-white/10 rounded-lg p-3">
+                      <p className="font-medium mb-1">🔄 Max Iterations</p>
+                      <p className="text-slate-300">Training epochs. More = better learning but longer time. Monitor for convergence and overfitting.</p>
+                    </div>
+                    <div className="bg-white/10 rounded-lg p-3">
+                      <p className="font-medium mb-1">📦 Batch Size</p>
+                      <p className="text-slate-300">Samples per gradient update. Larger = more stable but needs more memory. Smaller = noisy but faster convergence.</p>
                     </div>
                     <div className="bg-white/10 rounded-lg p-3">
                       <p className="font-medium mb-1">🎲 Dropout Rate</p>
-                      <p className="text-slate-300">Percentage of neurons to ignore during training</p>
+                      <p className="text-slate-300">Percentage of neurons randomly ignored during training. Prevents overfitting by reducing co-adaptation between neurons.</p>
                     </div>
                   </>
                 )}
-                {/* Add more parameter guides for other models as needed */}
               </div>
             </div>
           </div>
